@@ -1,0 +1,841 @@
+: Dissemination
+// 52 commits
+// going from Aug 18 (6:41h) to Oct 20
+// 49 commits (51 with irrelevant)
+// going from Aug 28 (4:53h) to Oct 20
+   Commit: 6cc6ddf28f2ac76cd28a
+   Date:   Sat Aug 28 12:53:15 2010 +0100
+   Msg:    initializing app
+   Type:   Runtime Infrastructure
+   18 lines added
+
+   Commit: 671cdc48739193d6abe9
+   Date:   Sat Aug 28 13:29:19 2010 +0100
+   Msg:    server startup
+   Type:   Runtime Infrastructure
+   11 lines edited from other project
+   175 lines added from other project
+   6 lines deleted
+
+   Commit: 4c233c6d9e1ebeef319f
+   Date:   Sat Aug 28 16:12:42 2010 +0100
+   Msg:    plate collectors
+   Type:   Experimentation
+   28 lines added
+   3 lines edited from other project
+   11 lines added from other project
+   Type:   Composition
+   55 lines added
+   2 lines added from other project
+   Type:   Runtime Infrastructure
+   3 lines added
+   1 line added from other project
+
+   Commit: 37b88d8a2a055ccaf0d0
+   Date:   Sun Aug 29 03:13:07 2010 +0100
+   Msg:    ...
+   Type:   Composition
+   11 lines added
+
+   Commit: 026c3a95c1934174188f
+   Date:   Mon Aug 30 23:32:47 2010 +0100
+   Msg:    ...
+   Type:   Dependancy update
+   1 line deleted
+   1 line edited
+   Type:   Composition
+   28 lines deleted
+   3 lines edited
+   3 lines added
+
+   Commit: 790c9be0066ca9f10164
+   Date:   Tue Aug 31 11:36:46 2010 +0100
+   Msg:    reproducable timeout error
+   Type:   Runtime Infrastructure
+   1 line added
+   Type:   Composition
+   86 lines added from other project
+   18 lines edited from other project
+   142 lines added
+   Type:   Runtime Infrastructure
+   125 lines added from other project
+   1 line edited from other project
+
+   Commit: 3f416122875102958f05
+   Date:   Tue Aug 31 14:35:57 2010 +0100
+   Msg:    zwischenstand. produces a nice "sound flower"
+   Type:   Bug fixes
+   3 line edited
+   1 line added
+
+   Commit: a3b4e7b05314c413bb33
+   Date:   Tue Aug 31 23:20:19 2010 +0100
+   Msg:    shitty Actor.actor { } doesn't solve the detaching problem from osc reception for a reason beyond my knowledge. Workaround now with EventQueue.invokeLater, but that sucks for obvious reasons. Defer final solution ad infinitum though
+   Type:   Composition
+   3 lines edited
+   36 lines added
+   Type:   Debug printing
+   1 line deleted
+   1 line added
+   Type:   Bug fixes
+   1 line deleted
+   1 line added
+   Type:   Experimentation
+   1 line added
+
+   Commit: 0a5a47f16c0d3a06a233
+   Date:   Wed Sep 1 02:20:16 2010 +0100
+   Msg:    ...
+   Type:   Experimentation
+   2 line added
+   Type:   Bug fixes
+   1 line deleted
+   1 line added
+   Type:   Debug printing
+   1 line deleted
+   1 line added
+   Type:   Composition
+   4 lines edited
+   34 lines added
+
+   Commit: 5592d42c6c6dfd101e41
+   Date:   Wed Sep 1 14:39:51 2010 +0100
+   Msg:    quickly hacked fscape bridge
+   Type:   Cleanup (irrelevant)
+   1 lines deleted
+   4 lines edited
+   1 line added
+   Type:   Composition
+   2 lines deleted
+   1 line edited
+   11 lines added
+   Type:   Runtime Infrastructure
+   234 lines added
+
+   Commit: 1c3dda83e3877e02b49e
+   Date:   Wed Sep 1 17:49:29 2010 +0100
+   Msg:    ...
+   Type:   Composition
+   9 lines deleted
+   1 line edited
+   42 lines added
+   Type:   Runtime Infrastructure
+   4 lines edited
+   155 lines added
+   Type:   Debug printing
+   1 line deleted
+
+   Commit: 880a3ce033a63a4ee0fb
+   Date:   Wed Sep 1 20:39:40 2010 +0100
+   Msg:    more fscape ops
+   Type:   Runtime Infrastructure
+   5 lines edited
+   350 lines added
+
+   Commit: ad4df0956dd82055bdfe
+   Date:   Wed Sep 1 21:52:48 2010 +0100
+   Msg:    ...
+   Type:   Cleanup (irrelevant)
+   4 lines edited
+   3 lines added
+   Type:   Bug fixes
+   1 line edited
+   Type:   Composition
+   7 lines deleted
+   7 lines edited
+   50 lines added
+   Type:   Runtime Infrastructure
+   4 lines added
+   
+   Commit: b632dfb663e32be2fd4d
+   Date:   Wed Sep 1 23:22:18 2010 +0100
+   Msg:    begins to live. although starving soon...
+   Type:   Composition
+   1 line deleted
+   6 lines edited
+   52 lines added
+
+   Commit: 2f6c9ecedf592c8a9232
+   Date:   Thu Sep 2 01:11:39 2010 +0100
+   Msg:    ...
+   Type:   Composition
+   14 lines edited
+   39 lines added
+   Type:   Experimentation
+   1 line added
+
+   Commit: 52ed31ea5fc597430549
+   Date:   Thu Sep 2 15:50:38 2010 +0100
+   Msg:    ...
+   Type:   Composition
+   7 lines added
+   
+   Commit: 43ee18948fcea0269e14
+   Date:   Thu Sep 2 18:12:09 2010 +0100
+   Msg:    nope
+   Type:   Debug printing
+   1 line added
+   Type:   Bug fixes
+   1 line deleted
+   11 lines edited
+   7 lines added
+
+   Commit: 61731bd05c058ad15fd5
+   Date:   Thu Sep 2 23:59:50 2010 +0100
+   Msg:    ...
+   Type:   Runtime Infrastructure
+   1 line deleted
+   1 line edited
+   26 lines added
+   Type:   Debug printing
+   1 line deleted
+   
+   Commit: f0e0cccb64cfc63687f5
+   Date:   Fri Sep 3 23:20:02 2010 +0100
+   Msg:    hp control and soloing
+   Type:   Experimentation
+   6 lines deleted
+   7 lines edited
+   82 lines added
+
+   Commit: 74ed99d5de8dfcf5ab6e
+   Date:   Tue Sep 7 12:53:37 2010 +0200
+   Msg:    plates can be acitve/inactive
+   Type:   Experimentation
+   1 line deleted
+   5 lines edited
+   30 lines added
+   Type:   Composition
+   1 line edited
+   17 lines added
+   44 lines added from other project
+   Type:   Debug printing
+   1 line deleted
+   
+   Commit: db9af6ff0f56ef3e0960
+   Date:   Tue Sep 7 18:01:55 2010 +0200
+   Msg:    sprenger
+   Type:   Composition
+   1 edited
+   1 added
+   Type:   Experimentation
+   22 added
+   Type:   Cleanup (irrelevant)
+   6 lines edited
+   5 lines added
+   Type:   Runtime Infrastructure
+   52 lines added
+   Type:   Composition
+   168 lines added
+
+   Commit: 6d208724e27f410dad12
+   Date:   Wed Sep 8 00:24:17 2010 +0200
+   Msg:    regen
+   Type:   Experimentation
+   3 lines edited
+   13 lines added
+   Type:   Composition
+   23 lines deleted
+   9 lines edited
+   124 lines added
+   10 lines edited from self (Sprenger.scala)
+   25 lines added from self (Sprenger.scala)
+
+   Commit: db55b0cccb61bed66c38
+   Date:   Wed Sep 8 16:54:16 2010 +0200
+   Msg:    adding NRT
+   Type:   New Functionality
+   6 lines edited
+   2 lines added
+   255 lines added from other project
+
+   Commit: 3752681a402379c84be5
+   Date:   Thu Sep 9 12:02:08 2010 +0200
+   Msg:    windspiel
+   Type:   New Functionality
+   38 lines added
+   Type:   Cleanup (irrelevant)
+   1 line edited
+   Type:   Experimentation
+   40 lines added
+   Type:   Runtime Infrastructure
+   7 lines added
+   Type:   Composition
+   4 lines deleted
+   3 lines edited
+   291 lines added
+   8 lines added from self (WaterLike.scala)
+   9 lines added from self (Plate.scala)
+   1 line edited from self (Plate.scala)
+
+   Commit: b646bee080c458191123
+   Date:   Thu Sep 9 14:23:44 2010 +0200
+   Msg:    meta
+   Type:   Cleanup (irrelevant)
+   2 lines edited
+   Type:   Composition
+   7 lines deleted
+   1 line edited
+   152 lines added
+
+   Commit: 7c6d65dd33da52e61b0f2de8fc189a3bcd5024d2
+   Date:   Thu Sep 9 15:41:11 2010 +0200
+   Msg:    ...
+   Type:   Composition
+   4 lines edited
+   8 lines added
+
+   Commit: a3b37b061e3fe619558a0d8bf7098259c15b1cf7
+   Date:   Fri Sep 10 13:26:22 2010 +0200
+   Msg:    second collector
+   Type:   Composition
+   13 lines edited
+   5 lines added
+
+   Commit: abb1c55d1a2d1388362356d9f65337b209c6016e
+   Date:   Fri Sep 10 13:55:55 2010 +0200
+   Msg:    zwischenstand
+   Type:   Composition
+   50 lines added
+   6 lines edited from self (Sprenger.scala)
+   4 lines added from self (Sprenger.scala)
+   24 lines added from self (WaterLike.scala)
+   18 lines edited from self (WaterLike.scala)
+
+   Commit: d0d082b780307f103e6c8bd4ec821129c621068b
+   Date:   Fri Sep 10 16:49:17 2010 +0200
+   Msg:    apfel working
+   Type:   Composition
+   2 lines deleted
+   13 lines edited
+   60 lines added
+
+   Commit: f69e2b796644391ddf11c06ae85d8e33ed3d8deb
+   Date:   Sun Sep 12 15:46:23 2010 +0200
+   Msg:    fixes. +phylet
+   Type:   Composition
+   5 lines edited
+   73 lines added
+   11 lines edited from self (Apfelessen.scala)
+   44 lines added from self (Apfelessen.scala)
+   Type:   Cleanup (irrelevant)
+   3 lines edited
+   Type:   Bug fixes
+   1 line edited
+
+   Commit: 199eff239cbd707f58f2adef292fb07268cf15f9
+   Date:   Thu Sep 16 17:34:22 2010 +0200
+   Msg:    added licht. fixing factory duplication... resulting in a problem with plate producing new synthdefs over and over disappearing (might also be due to commenting out the diskin pointer) ... must investigate this problem later!!
+   Type:   Bug fixes
+   8 lines edited
+   2 line added
+   Type:   Debug printing
+   1 line deleted
+   10 lines edited
+   1 line added
+   Type:   Runtime Infrastructure
+   2 line deleted
+   4 lines edited
+   6 lines added
+   Type:   Composition
+   4 line edited
+   67 lines added
+   10 lines added from self (WaterLike.scala)
+   2 lines edited from self (Apfelessen.scala)
+   5 lines added from self (Apfelessen.scala)
+   93 lines added from self (Phylet.scala)
+   2 lines edited from self (Phylet.scala)
+   Type:   Cleanup (irrelevant)
+   2 lines deleted
+
+   Commit: 7bab09d68ebd1f91362465cb0549d7b3c16407a3
+   Date:   Fri Sep 17 10:36:38 2010 +0200
+   Msg:    fix for regen done action, windspiel nrt timing
+   Type:   Bug fixes
+   1 line deleted
+   1 line edited
+   1 line added
+   Type:   Composition
+   1 line edited
+
+   Commit: 7e30228ecf689860cc498fce503d738c05519a22
+   Date:   Fri Sep 17 10:51:43 2010 +0200
+   Msg:    before adding fscape restart
+   Type:   Runtime Infrastructure
+   4 lines added
+   Type:   Debug printing
+   4 lines edited
+   4 lines added
+   Type:   Bug fixes
+   2 lines added
+
+   Commit: e4a15817b5f0be3be5f6cefc85e8229f41efddd3
+   Date:   Fri Sep 17 12:09:14 2010 +0200
+   Msg:    fscape restart working
+   Type:   Runtime Infrastructure
+   14 lines deleted
+   3 lines edited
+   70 lines added
+   Type:   Bug fixes
+   1 line edited
+   1 line added
+
+   Commit: 0fa993c545ef47b1708fd73f856d2dfb4e35c690
+   Date:   Fri Sep 17 12:26:38 2010 +0200
+   Msg:    longer light
+   Type:   Debug printing
+   1 line edited
+   Type:   Composition
+   1 line edited
+
+   Commit: e4173921f214b862df0ade34f59d14aa70c6462a
+   Date:   Fri Sep 17 12:41:25 2010 +0200
+   Msg:    thinning out the memory...
+   Type:   Composition
+   1 line edited
+   7 lines added
+
+   Commit: a9364b8d16eb0fe2f2dc566225aae59e4762ae7c
+   Date:   Fri Sep 17 12:43:46 2010 +0200
+   Msg:    ...
+   Type:   Bug fixes
+   1 line edited
+
+   Commit: c8de4e5df383dfa7736bce426c0bc308a161a34f
+   Date:   Fri Sep 17 12:50:00 2010 +0200
+   Msg:    adding shutdown button
+   Type:   Runtime Infrastructure
+   2 lines edited
+   12 lines added
+   Type:   Cleanup (irrelevant)
+   38 lines deleted
+
+   Commit: 1ecf8ec0facbe24e79dedfaea74c6c3aad3c1451
+   Date:   Fri Sep 17 13:39:09 2010 +0200
+   Msg:    bounce path configured. should run now from other account
+   Type:   Runtime Infrastructure
+   4 lines edited
+   5 lines added
+   Type:   Debug printing
+   1 line added
+
+   Commit: 377be35dce11129de389da2a632b366e2d7e2d0d
+   Date:   Fri Sep 17 13:53:13 2010 +0200
+   Msg:    ...
+   Type:   Runtime Infrastructure
+   1 line edited
+   Type:   Debug printing
+   1 line deleted
+
+   Commit: 43db3ec2e370c2625b5d61fd7b909dc3348b86e6
+   Date:   Sat Sep 18 12:18:29 2010 +0200
+   Msg:    autorestart
+   Type:   Bug fixes
+   13 lines added
+
+   Commit: 70d840a28ff06bcc4d4f183ca70b0c9f730337d3
+   Date:   Wed Sep 22 15:08:13 2010 +0200
+   Msg:    ...
+   Type:   Composition
+   2 lines edited
+   5 lines added
+
+   // --- graz starts here ---
+
+   Commit: dd2c76b91a0baffd5134539ee7b906742696dbb2
+   Date:   Sun Oct 17 20:45:26 2010 +0200
+   Msg:    enabling 7-channel setup for graz
+   Type:   Runtime Infrastructure
+   1 line edited
+   1 line added
+   Type:   Composition
+   5 line edited
+   3 lines added
+   Type:   Debug printing
+   1 line added
+
+   Commit: faf9966f6e5139fd928ef0a31dfc3f91a7d6d9ff
+   Date:   Mon Oct 18 00:34:10 2010 +0200
+   Msg:    zeven working
+   Type:   Composition
+   19 line deleted
+   16 lines edited
+   21 lines added
+   Type:   Experimentation
+   16 lines added
+   Type:   Debug printing
+   1 line deleted
+
+   Commit: b7490eaa31882dcecb50e0780cd291d071d5229a
+   Date:   Mon Oct 18 01:54:12 2010 +0200
+   Msg:    heli
+   Type:   Experimentation
+   19 lines added
+   Type:   Composition
+   1 line edited
+   14 lines added
+   61 lines added from self (Phylet.scala)
+   6 lines edited from self (Phylet.scala)
+
+   Commit: 97f5e8dc0e0f9bf24e1d7a8acdc1da313675ca39
+   Date:   Mon Oct 18 02:01:59 2010 +0200
+   Msg:    workaround bundle size limit
+   Type:   Bug fixes
+   1 line deleted
+   1 line edited
+   7 lines added
+
+   Commit: 7aa325251c6625ebad5eaf79827c3cc380f17a17
+   Date:   Tue Oct 19 19:23:05 2010 +0200
+   Msg:    neue raumkonfig esc
+   Type:   Runtime Infrastructure
+   1 line edited
+   1 line added
+   Type:   Composition  
+   1 line deleted
+   2 lines edited
+   4 lines added
+
+   Commit: 5b0a4d76b699f466e259582eccf6e3827a0f5631
+   Date:   Tue Oct 19 22:45:44 2010 +0200
+   Msg:    reducing restart period
+   Type:   Bug fixes
+   1 line edited
+
+   Commit: 7c3bdc91ed0c23f2bec232283ce613aa414c86ce
+   Date:   Wed Oct 20 10:59:14 2010 +0200
+   Msg:    graz licht
+   Type:   Experimentation
+   16 lines added
+   Type:   Composition  
+   1 line edited
+   1 line added
+
+// ScalaCollider-Swing has 8 commits in this period
+: ScalaCollider-Swing has 1 commits in this period (4 with irrelevant)
+   Commit: 1d204bb057512da68d7a
+   Date:   Mon Aug 30 00:20:49 2010 +0100
+   Msg:    new boot notification
+   Type:   Dependancy update
+   3 lines deleted
+   2 line edited
+   2 line added
+
+// Wolkenpumpe has 9 commits in this period
+: Wolkenpumpe has 4 commits in this period (6 with irrelevant)
+   Commit: e80a4613309956fe6e21
+   Date:   Sat Aug 28 13:14:20 2010 +0100
+   Msg:    ...
+   Type:   Version bump, Dependancy update
+   1 line deleted
+   4 lines edited
+   
+   Commit: c73bcd966327fcb177a4
+   Date:   Mon Aug 30 00:39:41 2010 +0100
+   Msg:    ...
+   Type:   Dependancy update
+   2 lines deleted
+   1 line edited
+
+   Commit: 084123282e32dd775680
+   Date:   Mon Aug 30 23:32:34 2010 +0100
+   Msg:    ..
+   Type:   Debug printing
+   1 lines deleted
+   1 line edited
+
+   Commit: e03e65e38cb0c3da9c45
+   Date:   Tue Aug 31 14:35:07 2010 +0100
+   Msg:    version bump for introduction of ProcTxn.spawnAtomic
+   Type:   Dependancy update
+   1 line edited
+   Type:   Debug printing
+   1 line edited
+   Type:   Bug fixing
+   1 line edited
+
+// SoundProcesses has 16 commits in this period
+: SoundProcesses has 10 commits in this period (15 with irrelevant)
+   Commit: cefab148df6a1ff8b00f
+   Date:   Sat Aug 28 13:14:08 2010 +0100
+   Msg:    ...
+   Type:   Dependancy update
+   1 line edited
+
+   Commit: bb86e0035609a2dcb7ba
+   Date:   Mon Aug 30 02:03:44 2010 +0100
+   Msg:    <ge>.react( trig )( fun ) working
+   Type:   New Functionality
+   2 lines deleted
+   8 lines edited
+   139 lines added
+
+   Commit: d0136fbd918d2b6a4fdf
+   Date:   Mon Aug 30 17:55:34 2010 +0100
+   Msg:    ..
+   Type:   New Functionality
+   5 lines edited
+   7 lines added
+   Type:   Documentation
+   19 lines added
+
+   Commit: 91023252152dd0da73cc
+   Date:   Mon Aug 30 22:04:33 2010 +0100
+   Msg:    fixing osc-responder for "react"
+   Type:   New Functionality
+   1 line edited
+
+   Commit: 7a2c309c7eb267cc07aa
+   Date:   Mon Aug 30 23:32:55 2010 +0100
+   Msg:    ...
+   Type:   New Functionality
+   3 lines added
+
+   Commit: fdf0df944b8c6be7d643
+   Date:   Tue Aug 31 14:32:22 2010 +0100
+   Msg:    killed that nasty timeout bug. until we have settled with model/listener threading in scalacollider or with proctxn blocking during commit, the solution is spawn transactions via separate actors (seems pretty light-weight) when they are invoked from observers. this is true for richnode's onEnd for the library itself, but users must be aware of this. trigger reactions are another case where ProcTxn.spawnAtomic should be used now.
+   Type:   Version bump
+   1 line edited
+   Type:   Bug fixes
+   9 deleted
+   3 edited
+   19 added
+
+   Commit: aba0a6fb5103b152e9c5
+   Date:   Wed Sep 1 00:14:43 2010 +0100
+   Msg:    we have a daemonactor now to execute the code of ProcTxn.spawnAtomic. maybe not the most elegant solution, as it linearizes everything into one thread which is exactly not what the STM is for (you should be able to massively execute parallel), this is working fine for the case of SoundProcesses. can stick to this solution for a while...
+   Type:   Bug fixes
+   1 line deleted
+   1 line edited
+   12 lines added
+
+   Commit: d9c2da74e983cfe13acf
+   Date:   Wed Sep 1 02:19:48 2010 +0100
+   Msg:    adding bufRecord
+   Type:   New Functionality
+   2 lines edited
+   31 lines added
+   Type:   Documentation
+   6 lines added
+
+   Commit: 221d903604a12638ab46
+   Date:   Thu Sep 2 22:04:01 2010 +0100
+   Msg:    fixing gliding (still restricted to audio rate)
+   Type:   Cleanup (irrelevant)
+   16 lines deleted
+   1 line edited
+   11 lines added
+   Type:   Bug fixes
+   3 lines edited
+   2 lines added
+   
+   Commit: fe4f18756ee7b32d6304
+   Date:   Fri Sep 3 00:22:05 2010 +0100
+   Msg:    ...
+   Type:   Improved Functionality
+   1 line added
+
+
+// ScalaCollider has 32 commits in this period
+: ScalaCollider has 20 commits in this period (25 with irrelevant)
+   Commit: e42dc1beed0bc0f7f402
+   Date:   Sat Aug 28 14:22:04 2010 +0100
+   Msg:    PanAz doc. Better orient default
+   Type:   Documentation
+   28 lines added
+
+   Commit: 091a088e2dc7303bc0a8
+   Date:   Sat Aug 28 20:16:50 2010 +0100
+   Msg:    MultiOutUGen uses varag inputs. Some cleanup. Adding MachineListening ugens
+   Type:   Cleanup (irrelevant)
+   4 lines deleted
+   222 lines edited
+   6 lines added
+   Type:   Documentation
+   1 line edited
+   221 lines added
+   Type:   New Functionality
+   66 lines added
+
+   Commit: 8f3912cc9b2e4a9ea4d5
+   Date:   Sat Aug 28 21:32:31 2010 +0100
+   Msg:    more ugen docs
+   Type:   Documentation
+   152 lines added
+
+   Commit: a06799d02d352759ae6f
+   Date:   Sat Aug 28 21:40:45 2010 +0100
+   Msg:    typos. scaladoc still chokes a bit
+   Type:   Documentation
+   6 lines edited
+
+   Commit: a319371a19cc3f1c6837
+   Date:   Sat Aug 28 21:45:36 2010 +0100
+   Msg:    fixing UGenIn : outputs return type
+   Type:   Cleanup (irrelevant)
+   1 line edited
+   1 line added
+
+   Commit: 0236a0d47055025c2b86
+   Date:   Sun Aug 29 03:04:42 2010 +0100
+   Msg:    cleanup. SynthGraph.expand +20% faster. poll fixed and improved
+   Type:   Cleanup (irrelevant)
+   71 lines deleted
+   92 lines edited
+   53 lines added
+   Type:   Documentation
+   22 lines added
+   Type:   New Functionality
+   18 lines added
+
+   Commit: f5504e7a35066a1a943e
+   Date:   Sun Aug 29 19:27:51 2010 +0100
+   Msg:    adding SendReply. changing arg order of SendTrig.ar/kr (--WARNING--)
+   Type:   Cleanup (irrelevant)
+   4 lines deleted
+   10 lines edited
+   3 lines added
+   Type:   Documentation
+   70 lines added
+   Type:   New Functionality
+   2 lines edited
+   14 lines added
+
+   Commit: 22433b871707f243a1eb
+   Date:   Sun Aug 29 22:30:32 2010 +0100
+   Msg:    removing separate start method from ServerConnection. to guarantee that listeners are able to attach themselves beforehand, they can now go in the second argument list. hopefully that's a good design now...
+   Type:   Improved Functionality
+   5 line deleted
+   12 lines edited
+   13 lines added
+   Type:   New Functionality
+   6 lines added
+
+   Commit: b8aca8a1b5dffe97ec0e
+   Date:   Mon Aug 30 00:20:30 2010 +0100
+   Msg:    model.listener starts to get on my nerves
+   Type:   Improved Functionality
+   2 lines deleted
+   12 lines edited
+   51 lines added
+
+   Commit: 3aa671954c1d378868b8
+   Date:   Mon Aug 30 15:44:44 2010 +0100
+   Msg:    fighting again with implicits. almost done
+   Type:   Improved Functionality
+   2 lines added
+   Type:   Documentation
+   17 lines added
+
+   Commit: 4f562e8c8ff98573b2da
+   Date:   Mon Aug 30 17:43:22 2010 +0100
+   Msg:    "i can't believe it's not butter" (that's how british call margarine)
+   Type:   Cleanup (irrelevant)
+   87 lines deleted
+   5 lines edited
+   9 lines added
+   Type:   New Functionality
+   47 lines deleted
+   1 line edited
+   182 lines added
+   Type:   Documentation
+   6 lines added
+
+   Commit: cdf388e76b5128b588a2
+   Date:   Tue Aug 31 14:30:53 2010 +0100
+   Msg:    spotted the timeout problem in soundprocesses. added warnings to the !! method. as a side-product, in scalacollider, the future is now revocable 8----)
+   Type:   New Functionality
+   3 lines deleted
+   6 lines edited
+   8 lines added
+   Type:   Documentation
+   41 lines added
+   Type:   Bug fixes
+   2 lines edited
+   6 lines added
+   
+   Commit: 50e7b31cd931c9cada39
+   Date:   Tue Aug 31 23:19:51 2010 +0100
+   Msg:    ...
+   Type:   Bug fixes
+   1 lines deleted
+   1 lines edited
+   11 lines added
+   
+   Commit: 47723ff0314de4035a6d
+   Date:   Wed Sep 1 00:13:45 2010 +0100
+   Msg:    trying to tackle the osc dispatch shit. sticking to original lightweight actor, client (SoundProcesses) should create their own actor to defer to in the case of code that involves futures.
+   Type:   Bug fixes
+   1 line deleted
+
+   Commit: 3a840346d3f931b6e512
+   Date:   Wed Sep 1 02:19:37 2010 +0100
+   Msg:    docs
+   Type:   Documentation
+   1 line deleted
+   1 line edited
+   78 lines added
+   Type:   Cleanup (irrelevant)
+   9 lines edited
+
+   Commit: 668182af90c56bc93b0c
+   Date:   Fri Sep 3 18:40:52 2010 +0100
+   Msg:    adding most FFT ugens. # of missing ugens < 50! (grain / fft2 / chaos / localbuf mainly)
+   Type:   Documentation
+   248 lines added
+   Type:   New Functionality
+   136 lines added
+
+   Commit: 2d6a058835a876808f58
+   Date:   Wed Sep 8 16:43:11 2010 +0200
+   Msg:    re-adding toNonRealtimeArgs
+   Type:   New Functionality
+   44 lines deleted
+   1 line edited
+   66 lines added
+
+   Commit: fa266bf02dd70540552a
+   Date:   Wed Sep 8 16:52:25 2010 +0200
+   Msg:    ...
+   Type:   New Functionality
+   1 line added
+
+   Commit: 1453a3d247d63be57270
+   Date:   Wed Sep 8 18:55:41 2010 +0200
+   Msg:    ...
+   Type:   New Functionality
+   1 line added
+
+   Commit: 2d4e782c0b5c14560e62
+   Date:   Wed Sep 8 19:20:33 2010 +0200
+   Msg:    !
+   Type:   New Functionality
+   1 line edited
+
+
+// FScape has 2 commits in this period
+//      Commit: 67
+//      Date:   Tue Oct 12 12:15:32 2010 UTC (5 months ago)
+//      Content: Irrelevant (adding DrMurke)
+// Commit 68 ist ebenso irrelevant
+
+// ScalaInterpreterPane has 2 commits in this period
+// 1 commit; irrelevant
+
+// ScalaAudioFile has 2 commits in this period
+//   Commit: 13487a783a41fbbea996
+//   Date:   Thu Oct 7 17:09:15 2010 +0200
+//   Msg:    adding openWrite. decreasing visibilities
+// --> incs scalaaudiofile to v0.14 while Dissemination remains on v0.13 !
+
+
+// // ScalaOSC has 2 commits in this period
+// ScalaOSC has ZERO commits in this period
+
+
+
+// NuagesApp has 9 commits in this period
+// (but most likely unrelated ; did the concert in Leizpig!)
+// 
+// FScapeJobs has 3 commits in this period
+// (i think it was out-sourced, wasn't it?)
