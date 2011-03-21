@@ -1,0 +1,6 @@
+h2. README
+
+An internal project of me, working with analysis data from the creation of Dissemination. (C)opyright by Hanns Holger Rutz. All rights reserved. Covered by the GNU General Public License v2+ (see licenses folder).
+
+This is coded in the Scala programming language and utilizes JFreeChart and iTextPDF.
+
