@@ -42,12 +42,20 @@ object LimitsOfControl extends Runnable {
       })
       val mapped: Map[ Int, Seq[ Edit ]] = grouped.map( tup => tup._1 -> tup._2.flatMap( _.activities.flatMap( _.edits )))( breakOut )
       val dfmt = new SimpleDateFormat( "MMM dd", Locale.UK )
-      mapped.foreach { case (day, edits) =>
+      val sorted = mapped.toList.sortBy( _._1 )
+      sorted.foreach { case (day, edits) =>
          cal.set( Calendar.DAY_OF_YEAR, day )
-         val eg = edits.groupBy( _.source ).map( tup => tup._1 -> tup._2.groupBy( _.tpe ).map( tup => tup._1 -> tup._2.foldLeft(0)( (cnt, ed) => cnt + ed.numLines )))
-         eg.foreach { case (src, eg1) =>
-            eg1.foreach { case (tpe, num) =>
-               set.addValue( num, EditCategory( src.tpe, tpe ), dfmt.format( cal.getTime() ))
+         val eg: Map[ EditSourceType, Map[ EditType, Int ]] = edits.groupBy( _.source.tpe ).map( tup => tup._1 -> tup._2.groupBy( _.tpe ).map( tup => tup._1 -> tup._2.foldLeft(0)( (cnt, ed) => cnt + ed.numLines )))
+//         eg.foreach { case (src, eg1) =>
+//            eg1.foreach { case (tpe, num) =>
+//               set.addValue( num, EditCategory( src, tpe ), dfmt.format( cal.getTime() ))
+//            }
+//         }
+         List( EditSourceNew, EditSourceOther, EditSourceSelf ).foreach { src =>
+            val m = eg.getOrElse( src, Map.empty )
+            List( EditInsert, EditModify, EditDelete ).foreach { tpe =>
+               val num = m.getOrElse( tpe, 0 )
+               set.addValue( num, EditCategory( src, tpe ), dfmt.format( cal.getTime() ))
             }
          }
       }
@@ -61,7 +69,7 @@ object LimitsOfControl extends Runnable {
 
       val renderer = new GroupedStackedBarRenderer()
       val map = new KeyToGroupMap( "G1" )
-      List( EditSourceNew, EditSourceSelf, EditSourceOther ).zipWithIndex.foreach { case (src, i) =>
+      List( EditSourceNew, EditSourceOther, EditSourceSelf ).zipWithIndex.foreach { case (src, i) =>
          val group = "G" + (i+1)
          List( EditInsert, EditModify, EditDelete ).foreach { tpe =>
             map.mapKeyToGroup( EditCategory( src, tpe ), group )
@@ -71,34 +79,34 @@ object LimitsOfControl extends Runnable {
 
       renderer.setItemMargin( 0.10 )
       renderer.setDrawBarOutline( false )
-      val p1 = Color.red // new GradientPaint( 0.0f, 0.0f, new Color(0x22, 0x22, 0xFF),  0.0f, 0.0f, new Color( 0x88, 0x88, 0xFF ))
+      val p1 = new Color( 0, 0xA0, 0 ) // new GradientPaint( 0.0f, 0.0f, new Color(0x22, 0x22, 0xFF),  0.0f, 0.0f, new Color( 0x88, 0x88, 0xFF ))
       renderer.setSeriesPaint(  0, p1 )
-      renderer.setSeriesPaint(  4, p1 )
-      renderer.setSeriesPaint(  8, p1 )
+      renderer.setSeriesPaint(  3, p1 )
+      renderer.setSeriesPaint(  6, p1 )
 
-      val p2 = Color.green // new GradientPaint( 0.0f, 0.0f, new Color( 0x22, 0xFF, 0x22), 0.0f, 0.0f, new Color( 0x88, 0xFF, 0x88 ))
+      val p2 = new Color( 0xC0, 0xA0, 0 ) // new GradientPaint( 0.0f, 0.0f, new Color( 0x22, 0xFF, 0x22), 0.0f, 0.0f, new Color( 0x88, 0xFF, 0x88 ))
       renderer.setSeriesPaint(  1, p2 )
-      renderer.setSeriesPaint(  5, p2 )
-      renderer.setSeriesPaint(  9, p2 )
+      renderer.setSeriesPaint(  4, p2 )
+      renderer.setSeriesPaint(  7, p2 )
 
-      val p3 = Color.blue // new GradientPaint( 0.0f, 0.0f, new Color( 0xFF, 0x22, 0x22 ), 0.0f, 0.0f, new Color( 0xFF, 0x88, 0x88 ))
+      val p3 = Color.red // new GradientPaint( 0.0f, 0.0f, new Color( 0xFF, 0x22, 0x22 ), 0.0f, 0.0f, new Color( 0xFF, 0x88, 0x88 ))
       renderer.setSeriesPaint(  2, p3 )
-      renderer.setSeriesPaint(  6, p3 )
-      renderer.setSeriesPaint( 10, p3 )
+      renderer.setSeriesPaint(  5, p3 )
+      renderer.setSeriesPaint(  8, p3 )
 
-      val p4 = Color.yellow // new GradientPaint( 0.0f, 0.0f, new Color( 0xFF, 0xFF, 0x22 ), 0.0f, 0.0f, new Color( 0xFF, 0xFF, 0x88 ))
-      renderer.setSeriesPaint(  3, p4 )
-      renderer.setSeriesPaint(  7, p4 )
-      renderer.setSeriesPaint( 11, p4 )
+//      val p4 = Color.yellow // new GradientPaint( 0.0f, 0.0f, new Color( 0xFF, 0xFF, 0x22 ), 0.0f, 0.0f, new Color( 0xFF, 0xFF, 0x88 ))
+//      renderer.setSeriesPaint(  3, p4 )
+//      renderer.setSeriesPaint(  7, p4 )
+//      renderer.setSeriesPaint( 11, p4 )
 
       renderer.setGradientPaintTransformer( new StandardGradientPaintTransformer( GradientPaintTransformType.HORIZONTAL ))
 //      renderer.setLegendItemLabelGenerator( new SOCRCategorySeriesLabelGenerator() )
 
-      val domainAxis = new SubCategoryAxis( "Product / Month" )
+      val domainAxis = new SubCategoryAxis( "XXX" )
       domainAxis.setCategoryMargin( 0.05 )
-      domainAxis.addSubCategory( "Product 1" )
-      domainAxis.addSubCategory( "Product 2" )
-      domainAxis.addSubCategory( "Product 3" )
+      domainAxis.addSubCategory( EditSourceNew.toString )
+      domainAxis.addSubCategory( EditSourceOther.toString )
+      domainAxis.addSubCategory( EditSourceSelf.toString )
 
       val plot = chart.getPlot().asInstanceOf[ CategoryPlot ]
       plot.setDomainAxis( domainAxis )
@@ -125,9 +133,9 @@ object LimitsOfControl extends Runnable {
       def id: Int
       def compareTo( b: EditSourceType ) = id.compareTo( b.id )
    }
-   case object EditSourceNew extends EditSourceType { def id = 0; override def toString = "New" }
-   case object EditSourceSelf extends EditSourceType { def id = 1; override def toString = "Self" }
-   case object EditSourceOther extends EditSourceType { def id = 2; override def toString = "Other" }
+   case object EditSourceNew extends EditSourceType {   def id = 0; override def toString = "New" }
+   case object EditSourceOther extends EditSourceType { def id = 1; override def toString = "Other" }
+   case object EditSourceSelf extends EditSourceType {  def id = 2; override def toString = "Self" }
 
    sealed trait EditSource { def tpe: EditSourceType }
    case object NewSource extends EditSource { def tpe = EditSourceNew }
