@@ -6,9 +6,9 @@ import java.io.{FileOutputStream, File}
 import java.text.{SimpleDateFormat, DateFormat}
 import java.util.{Locale, Calendar, TimeZone, Date}
 import javax.swing.{JComponent, JPanel, WindowConstants, JFrame}
-import org.jfree.chart.axis.SubCategoryAxis
+import org.jfree.chart.axis.{CategoryAnchor, SubCategoryAxis}
 import org.jfree.chart.plot.{CategoryPlot, PlotOrientation}
-import org.jfree.chart.renderer.category.GroupedStackedBarRenderer
+import org.jfree.chart.renderer.category.{StandardBarPainter, GroupedStackedBarRenderer}
 import org.jfree.chart.{ChartPanel, JFreeChart, ChartFactory}
 import org.jfree.data.category.{CategoryDataset, DefaultCategoryDataset}
 import collection.breakOut
@@ -29,18 +29,65 @@ object LimitsOfControl extends Runnable {
       val ln   = Source.fromFile( getClass().getResource( "GitActivity.txt" ).toURI, "UTF-8" ).getLines
       val ps   = readAll( ln )
       // p.size
-      process( ps )
+//      chart2( ps )
+//      collectActivities( ps ).foreach( println )
    }
 
-   def process( ps: Seq[ Project ]) {
+   def chart2( ps: Seq[ Project ]) {
+      val chart = createChart1( createCatSet1( filterComposition( ps )))
+      createPDF( onDesktop( "chart2.pdf" ), chart, 1000, 500 )
+   }
+
+   def chart1( ps: Seq[ Project ]) {
       val chart = createChart1( createCatSet1( ps ))
       // showChart( chart )
-      createPDF( onDesktop( "test.pdf" ), chart, 1000, 500 )
+      createPDF( onDesktop( "chart1.pdf" ), chart, 1000, 500 )
    }
 
    def onDesktop( name: String ) : File = {
       new File( new File( System.getProperty( "user.home" ), "Desktop" ), name )
    }
+
+   /**
+    * Results:
+
+   Cleanup (irrelevant)
+   Composition
+   Improved Functionality
+   New Functionality
+   Experimentation
+   Documentation
+   Bug fixes
+   Runtime Infrastructure
+   Dependancy update
+   Debug printing
+
+    possible groupings:
+        Composition + Experimentation + New Functionality + Improved Functionality
+    vs. Cleanup + Bug fixes + Runtime Infrastructure + Dependancy update + Debug printing
+    vs. Documentation
+
+    */
+//   def collectActivities( ps: Seq[ Project ]) : Set[ String ] = {
+//      ps.flatMap( _.commits.flatMap( _.activities.map( _.name )))( breakOut ) : Set[ String ]
+//   }
+
+   object ActivityType {
+//      apply( str: String ) : ActivityType = map( str )
+//      private lazy val map : Map[ String, Activity ] =
+//         List( ActivityClean, ActivityCompo. ActivityImpro ... ).map( tpe => tpe.name -> tpe )
+   }
+   sealed abstract class ActivityType( val name: String )
+   case object ActivityClean  extends ActivityType( "Cleanup (irrelevant)" )
+   case object ActivityCompo  extends ActivityType( "Composition" )
+   case object ActivityImpro  extends ActivityType( "Improved Functionality" )
+   case object ActivityFunc   extends ActivityType( "New Functionality" )
+   case object ActivityExperi extends ActivityType( "Experimentation" )
+   case object ActivityDocu   extends ActivityType( "Documentation" )
+   case object ActivityBugfix extends ActivityType( "Bug fixes" )
+   case object ActivityInfra  extends ActivityType( "Runtime Infrastructure" )
+   case object ActivityUpdate extends ActivityType( "Dependancy update" )
+   case object ActivityPrint  extends ActivityType( "Debug printing" )
 
    def createPDF( file: File, chart: JFreeChart, width: Int, height: Int ) {
 //      val width      = comp.getWidth
@@ -62,6 +109,48 @@ object LimitsOfControl extends Runnable {
       doc.close
    }
 
+   def filterComposition( ps: Seq[ Project ]) : Seq[ Project ] =
+      ps.map( p => p.copy( commits = p.commits.map( c => c.copy( activities = c.activities.filter( a =>
+         a.name == "Composition" || a.name == "Experimentation" )))))
+
+   /**
+    * LOC categorized by source and activity type
+    *   Composition + Experimentation + New Functionality + Improved Functionality
+    *   vs. Cleanup + Bug fixes + Runtime Infrastructure + Dependancy update + Debug printing
+    */
+   def createCatSet2( ps: Seq[ Project ]) : CategoryDataset = {
+      val set  = new DefaultCategoryDataset()
+      val p    = ps.find( _.name == "Dissemination" ).get
+      val cal  = Calendar.getInstance( TimeZone.getTimeZone( "BST" ))
+      val grouped = p.commits.groupBy( c => {
+         cal.setTime( c.date )
+         cal.get( Calendar.DAY_OF_YEAR  )
+      })
+      val mapped: Map[ Int, Seq[ Edit ]] = grouped.map( tup => tup._1 -> tup._2.flatMap( _.activities.flatMap( _.edits )))( breakOut )
+      val dfmt = new SimpleDateFormat( "MMM dd", Locale.UK )
+      val sorted = mapped.toList.sortBy( _._1 )
+      sorted.foreach { case (day, edits) =>
+         cal.set( Calendar.DAY_OF_YEAR, day )
+         val eg: Map[ EditSourceType, Map[ EditType, Int ]] = edits.groupBy( _.source.tpe ).map( tup => tup._1 -> tup._2.groupBy( _.tpe ).map( tup => tup._1 -> tup._2.foldLeft(0)( (cnt, ed) => cnt + ed.numLines )))
+//         eg.foreach { case (src, eg1) =>
+//            eg1.foreach { case (tpe, num) =>
+//               set.addValue( num, EditCategory( src, tpe ), dfmt.format( cal.getTime() ))
+//            }
+//         }
+         List( EditSourceNew, EditSourceOther, EditSourceSelf ).foreach { src =>
+            val m = eg.getOrElse( src, Map.empty )
+            List( EditInsert, EditModify, EditDelete ).foreach { tpe =>
+               val num = m.getOrElse( tpe, 0 )
+               set.addValue( num, EditCategory( src, tpe ), dfmt.format( cal.getTime() ))
+            }
+         }
+      }
+      set
+   }
+
+   /**
+    * LOC categorized by source and edit type
+    */
    def createCatSet1( ps: Seq[ Project ]) : CategoryDataset = {
       val set  = new DefaultCategoryDataset()
       val p    = ps.find( _.name == "Dissemination" ).get
@@ -94,7 +183,7 @@ object LimitsOfControl extends Runnable {
 
    def createChart1( set: CategoryDataset ) : JFreeChart = {
       val chart = ChartFactory.createStackedBarChart(
-         "Title", "Category", "LOC", set,
+         "Commit History", "Category", "LOC", set,
          PlotOrientation.VERTICAL, true, false, false )
 
       val renderer = new GroupedStackedBarRenderer()
@@ -129,20 +218,34 @@ object LimitsOfControl extends Runnable {
 //      renderer.setSeriesPaint(  7, p4 )
 //      renderer.setSeriesPaint( 11, p4 )
 
-      renderer.setGradientPaintTransformer( new StandardGradientPaintTransformer( GradientPaintTransformType.HORIZONTAL ))
+//      renderer.setGradientPaintTransformer( new StandardGradientPaintTransformer( GradientPaintTransformType.HORIZONTAL ))
 //      renderer.setLegendItemLabelGenerator( new SOCRCategorySeriesLabelGenerator() )
+      renderer.setBarPainter( new StandardBarPainter() )
 
       val domainAxis = new SubCategoryAxis( "XXX" )
       domainAxis.setCategoryMargin( 0.05 )
       domainAxis.addSubCategory( "N" ) // EditSourceNew.toString )
       domainAxis.addSubCategory( "E" ) // EditSourceOther.toString )
       domainAxis.addSubCategory( "I" ) // EditSourceSelf.toString )
+      domainAxis.setCategoryMargin( 0.2 )
+//      domainAxis.setAxisLineVisible( true )
+//      domainAxis.setAxisLinePaint( Color.blue )
 
       val plot = chart.getPlot().asInstanceOf[ CategoryPlot ]
       plot.setDomainAxis( domainAxis )
+
+      plot.setDomainGridlinesVisible( true )
+      plot.setDomainGridlinePaint( Color.lightGray )
+      plot.setDomainGridlinePosition( CategoryAnchor.START ) // XXX hmmm, not optimal ; could use MIDDLE with custom Stroke?
+
 //      plot.setDomainAxisLocation( AxisLocation.TOP_OR_RIGHT )
       plot.setRenderer(renderer);
 //      plot.setFixedLegendItems( createLegendItems() )
+      plot.setBackgroundPaint( Color.white )
+//      plot.setDomainGridlinePaint( Color.blue )
+      plot.setOutlinePaint( Color.gray )
+      // plot.setRangeCrosshairPaint( Color.blue )
+      plot.setRangeGridlinePaint( Color.lightGray )
 
       // setCategorySummary(dataset);
 

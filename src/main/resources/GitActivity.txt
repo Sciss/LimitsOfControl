@@ -526,9 +526,9 @@
    Commit: e80a4613309956fe6e21
    Date:   Sat Aug 28 13:14:20 2010 +0100
    Msg:    ...
-   Type:   Version bump, Dependancy update
+   Type:   Dependancy update
    1 line deleted
-   4 lines edited
+   3 lines edited
    
    Commit: c73bcd966327fcb177a4
    Date:   Mon Aug 30 00:39:41 2010 +0100
@@ -551,7 +551,7 @@
    1 line edited
    Type:   Debug printing
    1 line edited
-   Type:   Bug fixing
+   Type:   Bug fixes
    1 line edited
 
 // SoundProcesses has 16 commits in this period
@@ -594,8 +594,6 @@
    Commit: fdf0df944b8c6be7d643
    Date:   Tue Aug 31 14:32:22 2010 +0100
    Msg:    killed that nasty timeout bug. until we have settled with model/listener threading in scalacollider or with proctxn blocking during commit, the solution is spawn transactions via separate actors (seems pretty light-weight) when they are invoked from observers. this is true for richnode's onEnd for the library itself, but users must be aware of this. trigger reactions are another case where ProcTxn.spawnAtomic should be used now.
-   Type:   Version bump
-   1 line edited
    Type:   Bug fixes
    9 deleted
    3 edited
