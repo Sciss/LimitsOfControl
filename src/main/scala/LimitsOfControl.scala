@@ -1,8 +1,11 @@
+import com.itextpdf.text.pdf.PdfWriter
 import io.Source
+import java.awt.geom.Rectangle2D
 import java.awt.{BorderLayout, GradientPaint, Color, EventQueue}
+import java.io.{FileOutputStream, File}
 import java.text.{SimpleDateFormat, DateFormat}
 import java.util.{Locale, Calendar, TimeZone, Date}
-import javax.swing.{WindowConstants, JFrame}
+import javax.swing.{JComponent, JPanel, WindowConstants, JFrame}
 import org.jfree.chart.axis.SubCategoryAxis
 import org.jfree.chart.plot.{CategoryPlot, PlotOrientation}
 import org.jfree.chart.renderer.category.GroupedStackedBarRenderer
@@ -11,6 +14,7 @@ import org.jfree.data.category.{CategoryDataset, DefaultCategoryDataset}
 import collection.breakOut
 import org.jfree.data.KeyToGroupMap
 import org.jfree.ui.{StandardGradientPaintTransformer, GradientPaintTransformType}
+import com.itextpdf.text.{Document => IDocument, Rectangle => IRectangle}
 
 /**
  * (C)opyright 2011 Hanns Holger Rutz. All rights reserved.
@@ -29,7 +33,33 @@ object LimitsOfControl extends Runnable {
    }
 
    def process( ps: Seq[ Project ]) {
-      showChart( createChart1( createCatSet1( ps )))
+      val chart = createChart1( createCatSet1( ps ))
+      // showChart( chart )
+      createPDF( onDesktop( "test.pdf" ), chart, 1000, 500 )
+   }
+
+   def onDesktop( name: String ) : File = {
+      new File( new File( System.getProperty( "user.home" ), "Desktop" ), name )
+   }
+
+   def createPDF( file: File, chart: JFreeChart, width: Int, height: Int ) {
+//      val width      = comp.getWidth
+//      val height     = comp.getHeight
+      val pageSize	= new IRectangle( 0, 0, width, height )
+      val doc		   = new IDocument( pageSize, 0, 0, 0, 0 )
+      val stream	   = new FileOutputStream( file )
+      val writer	   = PdfWriter.getInstance( doc, stream )
+      doc.open()
+      val cb		   = writer.getDirectContent
+      val tp		   = cb.createTemplate( width, height )
+      val g2		   = tp.createGraphics( width, height )
+//      comp.paint( g2 )
+//      comp.print( g2 )
+      val r2         = new Rectangle2D.Double( 0, 0, width, height )
+      chart.draw( g2, r2 )
+      g2.dispose
+      cb.addTemplate( tp, 0, 0 )
+      doc.close
    }
 
    def createCatSet1( ps: Seq[ Project ]) : CategoryDataset = {
@@ -104,9 +134,9 @@ object LimitsOfControl extends Runnable {
 
       val domainAxis = new SubCategoryAxis( "XXX" )
       domainAxis.setCategoryMargin( 0.05 )
-      domainAxis.addSubCategory( EditSourceNew.toString )
-      domainAxis.addSubCategory( EditSourceOther.toString )
-      domainAxis.addSubCategory( EditSourceSelf.toString )
+      domainAxis.addSubCategory( "N" ) // EditSourceNew.toString )
+      domainAxis.addSubCategory( "E" ) // EditSourceOther.toString )
+      domainAxis.addSubCategory( "I" ) // EditSourceSelf.toString )
 
       val plot = chart.getPlot().asInstanceOf[ CategoryPlot ]
       plot.setDomainAxis( domainAxis )
@@ -119,7 +149,7 @@ object LimitsOfControl extends Runnable {
       chart
    }
 
-   def showChart( chart: JFreeChart ) {
+   def showChart( chart: JFreeChart ) : JPanel = {
       val f = new JFrame( "Chart" )
       val p = new ChartPanel( chart )
       f.getContentPane().add( p, BorderLayout.CENTER )
@@ -127,6 +157,7 @@ object LimitsOfControl extends Runnable {
       f.setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE )
       f.setLocationRelativeTo( null )
       f.setVisible( true )
+      p
    }
 
    sealed trait EditSourceType extends Comparable[ EditSourceType ] {
