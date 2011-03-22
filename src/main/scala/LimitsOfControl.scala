@@ -134,18 +134,27 @@ object LimitsOfControl extends Runnable {
       val set  = new DefaultCategoryDataset()
       val p    = filterNotDocumentation( ps ) // .find( _.name == "Dissemination" ).get
 
-      println( p )
+//      println( p )
 
       val cal  = Calendar.getInstance( TimeZone.getTimeZone( "BST" ))
       val grouped = p.flatMap( _.commits ).groupBy( c => {
          cal.setTime( c.date )
          cal.get( Calendar.DAY_OF_YEAR  )
       })
+      val act = grouped.mapValues( _.flatMap( _.activities ))
+
+      println( act.toList.sortBy( _._1 ))
+
 //      val mapped: Map[ Int, Seq[ Edit ]] = grouped.map( tup => tup._1 -> tup._2.flatMap( _.activities.flatMap( _.edits )))( breakOut )
 //      val mapped: Map[ Int, Map[ ActivityCateg, Map[ EditType, Int ]]] = grouped.mapValues( _.flatMap( _.activities )
 //         .groupBy( _.tpe : ActivityCateg ).mapValues[ Map[ EditType, Int ]]( _.flatMap( _.edits.groupBy( _.tpe ).mapValues( _.map( _.numLines ).sum ))( breakOut )))
-      val mapped: Map[ Int, Map[ ActivityCateg, Map[ EditSourceType, Int ]]] = grouped.mapValues( _.flatMap( _.activities )
-         .groupBy( _.tpe : ActivityCateg ).mapValues( _.flatMap( _.edits.groupBy( _.source.tpe ).mapValues( _.map( _.numLines ).sum ))( breakOut )))
+//      val mapped: Map[ Int, Map[ ActivityCateg, Map[ EditSourceType, Int ]]] = act.mapValues(
+//         _.groupBy( _.tpe : ActivityCateg ).mapValues( _.flatMap( _.edits.groupBy( _.source.tpe ).mapValues( _.map( _.numLines ).sum ))( breakOut )))
+      val mapped: Map[ Int, Map[ ActivityCateg, Map[ EditSourceType, Int ]]] = act.mapValues(
+         _.groupBy( _.tpe : ActivityCateg ).mapValues( _.flatMap( _.edits )).mapValues( _.groupBy( _.source.tpe )
+            .mapValues( _.map( _.numLines ).sum )))
+
+//            _.flatMap( _.edits.groupBy( _.source.tpe ).mapValues( _.map( _.numLines ).sum ))( breakOut )))
 
       val dfmt = new SimpleDateFormat( "MMM dd", Locale.UK )
       val sorted = mapped.toList.sortBy( _._1 )
@@ -166,6 +175,19 @@ object LimitsOfControl extends Runnable {
       set
    }
 
+   def mapHSBComponent( c: Color, i: Int, fun: Double => Double ) : Color = {
+      val arr = new Array[ Float ]( 3 )
+      Color.RGBtoHSB( c.getRed(), c.getGreen(), c.getBlue(), arr )
+      val f0 = fun( arr( i )).toFloat
+      val f  = if( i > 0 ) math.max( 0f, math.min( 1f, f0 )) else f0
+      arr( i ) = f
+      Color.getHSBColor( arr( 0 ), arr( 1 ), arr( 2 ))
+   }
+
+   def mapHue( c: Color, fun: Double => Double ) : Color        = mapHSBComponent( c, 0, fun )
+   def mapSaturation( c: Color, fun: Double => Double ) : Color = mapHSBComponent( c, 1, fun )
+   def mapBrightness( c: Color, fun: Double => Double ) : Color = mapHSBComponent( c, 2, fun )
+
    def createChart2( set: CategoryDataset ) : JFreeChart = {
       val chart = ChartFactory.createStackedBarChart(
          "Commit History", "Category", "LOC", set,
@@ -183,14 +205,17 @@ object LimitsOfControl extends Runnable {
 
       renderer.setItemMargin( 0.10 )
       renderer.setDrawBarOutline( false )
-      val p1 = new Color( 0, 0xA0, 0 ) // new GradientPaint( 0.0f, 0.0f, new Color(0x22, 0x22, 0xFF),  0.0f, 0.0f, new Color( 0x88, 0x88, 0xFF ))
-      renderer.setSeriesPaint(  0, p1 )
-      renderer.setSeriesPaint(  3, p1 )
+      val p1a = new Color( 0, 0xA0, 0 ) // new GradientPaint( 0.0f, 0.0f, new Color(0x22, 0x22, 0xFF),  0.0f, 0.0f, new Color( 0x88, 0x88, 0xFF ))
+      val p1b = Color.blue
+      renderer.setSeriesPaint(  0, p1a )
+      renderer.setSeriesPaint(  3,  p1b )
 //      renderer.setSeriesPaint(  6, p1 )
 
-      val p2 = new Color( 0xC0, 0xA0, 0 ) // new GradientPaint( 0.0f, 0.0f, new Color( 0x22, 0xFF, 0x22), 0.0f, 0.0f, new Color( 0x88, 0xFF, 0x88 ))
-      renderer.setSeriesPaint(  1, p2 )
-      renderer.setSeriesPaint(  4, p2 )
+//      val p2 = new Color( 0xC0, 0xA0, 0 ) // new GradientPaint( 0.0f, 0.0f, new Color( 0x22, 0xFF, 0x22), 0.0f, 0.0f, new Color( 0x88, 0xFF, 0x88 ))
+      val p2a = mapHue( mapSaturation( mapBrightness( p1a, _ * 1.6 ), _ * 0.6 ), _ - 0.05 )
+      val p2b = mapHue( mapSaturation( mapBrightness( p1b, _ * 2.4 ), _ * 0.35 ), _ - 0.05 )
+      renderer.setSeriesPaint(  1, p2a )
+      renderer.setSeriesPaint(  4, p2b )
 //      renderer.setSeriesPaint(  7, p2 )
 
       val p3 = Color.red // new GradientPaint( 0.0f, 0.0f, new Color( 0xFF, 0x22, 0x22 ), 0.0f, 0.0f, new Color( 0xFF, 0x88, 0x88 ))
@@ -219,9 +244,9 @@ object LimitsOfControl extends Runnable {
       val plot = chart.getPlot().asInstanceOf[ CategoryPlot ]
       plot.setDomainAxis( domainAxis )
 
-      plot.setDomainGridlinesVisible( true )
-      plot.setDomainGridlinePaint( Color.lightGray )
-      plot.setDomainGridlinePosition( CategoryAnchor.START ) // XXX hmmm, not optimal ; could use MIDDLE with custom Stroke?
+//      plot.setDomainGridlinesVisible( true )
+//      plot.setDomainGridlinePaint( Color.lightGray )
+//      plot.setDomainGridlinePosition( CategoryAnchor.START ) // XXX hmmm, not optimal ; could use MIDDLE with custom Stroke?
 
 //      plot.setDomainAxisLocation( AxisLocation.TOP_OR_RIGHT )
       plot.setRenderer(renderer);
@@ -241,8 +266,8 @@ object LimitsOfControl extends Runnable {
       implicit def fromType( tpe: ActivityType ) : ActivityCateg = tpe match {
          case ActivityCompo  => ActivityCategCompo
          case ActivityExperi => ActivityCategCompo
-         case ActivityFunc   => ActivityCategCompo
-         case ActivityImpro  => ActivityCategCompo
+         case ActivityFunc   => ActivityCategOther // ActivityCategCompo
+         case ActivityImpro  => ActivityCategOther // ActivityCategCompo
          case ActivityClean  => ActivityCategOther
          case ActivityInfra  => ActivityCategOther
          case ActivityPrint  => ActivityCategOther
