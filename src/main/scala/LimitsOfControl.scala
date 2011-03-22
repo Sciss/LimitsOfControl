@@ -31,6 +31,12 @@ object LimitsOfControl extends Runnable {
       // p.size
 //      chart2( ps )
 //      collectActivities( ps ).foreach( println )
+      chart3( ps )
+   }
+
+   def chart3( ps: Seq[ Project ]) {
+      val chart = createChart2( createCatSet2( ps ))
+      createPDF( onDesktop( "chart3.pdf" ), chart, 1000, 500 )
    }
 
    def chart2( ps: Seq[ Project ]) {
@@ -73,9 +79,12 @@ object LimitsOfControl extends Runnable {
 //   }
 
    object ActivityType {
-//      apply( str: String ) : ActivityType = map( str )
-//      private lazy val map : Map[ String, Activity ] =
-//         List( ActivityClean, ActivityCompo. ActivityImpro ... ).map( tpe => tpe.name -> tpe )
+      implicit def apply( str: String ) : ActivityType = map( str )
+
+      private lazy val map : Map[ String, ActivityType ] =
+         List( ActivityClean, ActivityCompo,  ActivityImpro, ActivityFunc,   ActivityExperi,
+               ActivityDocu,  ActivityBugfix, ActivityInfra, ActivityUpdate, ActivityPrint )
+            .map( tpe => tpe.name -> tpe )( breakOut )
    }
    sealed abstract class ActivityType( val name: String )
    case object ActivityClean  extends ActivityType( "Cleanup (irrelevant)" )
@@ -109,9 +118,12 @@ object LimitsOfControl extends Runnable {
       doc.close
    }
 
-   def filterComposition( ps: Seq[ Project ]) : Seq[ Project ] =
-      ps.map( p => p.copy( commits = p.commits.map( c => c.copy( activities = c.activities.filter( a =>
-         a.name == "Composition" || a.name == "Experimentation" )))))
+   def filterByActivity( ps: Seq[ Project ])( fun: ActivityType => Boolean ) : Seq[ Project ] =
+      ps.map( p => p.copy( commits = p.commits.map( c => c.copy( activities = c.activities.filter( a => fun( a.tpe ))))))
+
+   def filterComposition( ps: Seq[ Project ]) : Seq[ Project ] = filterByActivity( ps )( tpe => tpe == ActivityCompo || tpe == ActivityExperi )
+
+   def filterNotDocumentation( ps: Seq[ Project ]) : Seq[ Project ] = filterByActivity( ps )( _ != ActivityDocu )
 
    /**
     * LOC categorized by source and activity type
@@ -120,32 +132,139 @@ object LimitsOfControl extends Runnable {
     */
    def createCatSet2( ps: Seq[ Project ]) : CategoryDataset = {
       val set  = new DefaultCategoryDataset()
-      val p    = ps.find( _.name == "Dissemination" ).get
+      val p    = filterNotDocumentation( ps ) // .find( _.name == "Dissemination" ).get
+
+      println( p )
+
       val cal  = Calendar.getInstance( TimeZone.getTimeZone( "BST" ))
-      val grouped = p.commits.groupBy( c => {
+      val grouped = p.flatMap( _.commits ).groupBy( c => {
          cal.setTime( c.date )
          cal.get( Calendar.DAY_OF_YEAR  )
       })
-      val mapped: Map[ Int, Seq[ Edit ]] = grouped.map( tup => tup._1 -> tup._2.flatMap( _.activities.flatMap( _.edits )))( breakOut )
+//      val mapped: Map[ Int, Seq[ Edit ]] = grouped.map( tup => tup._1 -> tup._2.flatMap( _.activities.flatMap( _.edits )))( breakOut )
+//      val mapped: Map[ Int, Map[ ActivityCateg, Map[ EditType, Int ]]] = grouped.mapValues( _.flatMap( _.activities )
+//         .groupBy( _.tpe : ActivityCateg ).mapValues[ Map[ EditType, Int ]]( _.flatMap( _.edits.groupBy( _.tpe ).mapValues( _.map( _.numLines ).sum ))( breakOut )))
+      val mapped: Map[ Int, Map[ ActivityCateg, Map[ EditSourceType, Int ]]] = grouped.mapValues( _.flatMap( _.activities )
+         .groupBy( _.tpe : ActivityCateg ).mapValues( _.flatMap( _.edits.groupBy( _.source.tpe ).mapValues( _.map( _.numLines ).sum ))( breakOut )))
+
       val dfmt = new SimpleDateFormat( "MMM dd", Locale.UK )
       val sorted = mapped.toList.sortBy( _._1 )
-      sorted.foreach { case (day, edits) =>
+//      println( sorted )
+      sorted.foreach { case (day, map) =>
          cal.set( Calendar.DAY_OF_YEAR, day )
-         val eg: Map[ EditSourceType, Map[ EditType, Int ]] = edits.groupBy( _.source.tpe ).map( tup => tup._1 -> tup._2.groupBy( _.tpe ).map( tup => tup._1 -> tup._2.foldLeft(0)( (cnt, ed) => cnt + ed.numLines )))
-//         eg.foreach { case (src, eg1) =>
-//            eg1.foreach { case (tpe, num) =>
-//               set.addValue( num, EditCategory( src, tpe ), dfmt.format( cal.getTime() ))
-//            }
-//         }
-         List( EditSourceNew, EditSourceOther, EditSourceSelf ).foreach { src =>
-            val m = eg.getOrElse( src, Map.empty )
-            List( EditInsert, EditModify, EditDelete ).foreach { tpe =>
-               val num = m.getOrElse( tpe, 0 )
-               set.addValue( num, EditCategory( src, tpe ), dfmt.format( cal.getTime() ))
+         List( ActivityCategCompo, ActivityCategOther ).foreach { categ =>
+            val map2 = map.getOrElse( categ, Map.empty )
+            List( EditSourceNew, EditSourceOther, EditSourceSelf ).foreach { src =>
+               val num = map2.getOrElse( src, 0 )
+               val v = EditCategory2( src, categ )
+               val d = dfmt.format( cal.getTime() )
+               println( "" + d + " (" + cal.get( Calendar.DAY_OF_YEAR ) + "), " + num + ", " + v )
+               set.addValue( num, v, d )
             }
          }
       }
       set
+   }
+
+   def createChart2( set: CategoryDataset ) : JFreeChart = {
+      val chart = ChartFactory.createStackedBarChart(
+         "Commit History", "Category", "LOC", set,
+         PlotOrientation.VERTICAL, true, false, false )
+
+      val renderer = new GroupedStackedBarRenderer()
+      val map = new KeyToGroupMap( "G1" )
+      List( ActivityCategCompo, ActivityCategOther ).zipWithIndex.foreach { case (tpe, i) =>
+         val group = "G" + (i+1)
+         List( EditSourceNew, EditSourceOther, EditSourceSelf ).foreach { src =>
+            map.mapKeyToGroup( EditCategory2( src, tpe ), group )
+         }
+      }
+      renderer.setSeriesToGroupMap( map )
+
+      renderer.setItemMargin( 0.10 )
+      renderer.setDrawBarOutline( false )
+      val p1 = new Color( 0, 0xA0, 0 ) // new GradientPaint( 0.0f, 0.0f, new Color(0x22, 0x22, 0xFF),  0.0f, 0.0f, new Color( 0x88, 0x88, 0xFF ))
+      renderer.setSeriesPaint(  0, p1 )
+      renderer.setSeriesPaint(  3, p1 )
+//      renderer.setSeriesPaint(  6, p1 )
+
+      val p2 = new Color( 0xC0, 0xA0, 0 ) // new GradientPaint( 0.0f, 0.0f, new Color( 0x22, 0xFF, 0x22), 0.0f, 0.0f, new Color( 0x88, 0xFF, 0x88 ))
+      renderer.setSeriesPaint(  1, p2 )
+      renderer.setSeriesPaint(  4, p2 )
+//      renderer.setSeriesPaint(  7, p2 )
+
+      val p3 = Color.red // new GradientPaint( 0.0f, 0.0f, new Color( 0xFF, 0x22, 0x22 ), 0.0f, 0.0f, new Color( 0xFF, 0x88, 0x88 ))
+      renderer.setSeriesPaint(  2, p3 )
+      renderer.setSeriesPaint(  5, p3 )
+//      renderer.setSeriesPaint(  8, p3 )
+
+//      val p4 = Color.yellow // new GradientPaint( 0.0f, 0.0f, new Color( 0xFF, 0xFF, 0x22 ), 0.0f, 0.0f, new Color( 0xFF, 0xFF, 0x88 ))
+//      renderer.setSeriesPaint(  3, p4 )
+//      renderer.setSeriesPaint(  7, p4 )
+//      renderer.setSeriesPaint( 11, p4 )
+
+//      renderer.setGradientPaintTransformer( new StandardGradientPaintTransformer( GradientPaintTransformType.HORIZONTAL ))
+//      renderer.setLegendItemLabelGenerator( new SOCRCategorySeriesLabelGenerator() )
+      renderer.setBarPainter( new StandardBarPainter() )
+
+      val domainAxis = new SubCategoryAxis( "XXX" )
+      domainAxis.setCategoryMargin( 0.05 )
+      domainAxis.addSubCategory( "C" ) // EditSourceNew.toString )
+      domainAxis.addSubCategory( "O" ) // EditSourceOther.toString )
+//      domainAxis.addSubCategory( "I" ) // EditSourceSelf.toString )
+      domainAxis.setCategoryMargin( 0.2 )
+//      domainAxis.setAxisLineVisible( true )
+//      domainAxis.setAxisLinePaint( Color.blue )
+
+      val plot = chart.getPlot().asInstanceOf[ CategoryPlot ]
+      plot.setDomainAxis( domainAxis )
+
+      plot.setDomainGridlinesVisible( true )
+      plot.setDomainGridlinePaint( Color.lightGray )
+      plot.setDomainGridlinePosition( CategoryAnchor.START ) // XXX hmmm, not optimal ; could use MIDDLE with custom Stroke?
+
+//      plot.setDomainAxisLocation( AxisLocation.TOP_OR_RIGHT )
+      plot.setRenderer(renderer);
+//      plot.setFixedLegendItems( createLegendItems() )
+      plot.setBackgroundPaint( Color.white )
+//      plot.setDomainGridlinePaint( Color.blue )
+      plot.setOutlinePaint( Color.gray )
+      // plot.setRangeCrosshairPaint( Color.blue )
+      plot.setRangeGridlinePaint( Color.lightGray )
+
+      // setCategorySummary(dataset);
+
+      chart
+   }
+
+   object ActivityCateg {
+      implicit def fromType( tpe: ActivityType ) : ActivityCateg = tpe match {
+         case ActivityCompo  => ActivityCategCompo
+         case ActivityExperi => ActivityCategCompo
+         case ActivityFunc   => ActivityCategCompo
+         case ActivityImpro  => ActivityCategCompo
+         case ActivityClean  => ActivityCategOther
+         case ActivityInfra  => ActivityCategOther
+         case ActivityPrint  => ActivityCategOther
+         case ActivityBugfix => ActivityCategOther
+         case ActivityDocu   => ActivityCategOther
+         case ActivityUpdate => ActivityCategOther
+      }
+   }
+   sealed trait ActivityCateg extends Comparable[ ActivityCateg ] {
+      def id: Int
+      def compareTo( other: ActivityCateg ) = id.compareTo( other.id )
+   }
+   case object ActivityCategCompo extends ActivityCateg { def id = 0 }
+   case object ActivityCategOther extends ActivityCateg { def id = 1 }
+
+   case class EditCategory2( source: EditSourceType, activity: ActivityCateg ) extends Comparable[ EditCategory2 ] {
+      def compareTo( other: EditCategory2 ) = {
+         val c1 = source.compareTo( other.source )
+         if( c1 != 0 ) c1 else {
+            activity.compareTo( other.activity )
+         }
+      }
    }
 
    /**
@@ -294,7 +413,7 @@ object LimitsOfControl extends Runnable {
 
    case class Edit( source: EditSource, tpe: EditType, numLines: Int )
 
-   case class Activity( name: String, edits: Seq[ Edit ])
+   case class Activity( tpe: ActivityType, edits: Seq[ Edit ])
 
    case class Commit( id: String, date: Date, msg: String, activities: Seq[ Activity ])
 
