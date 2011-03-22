@@ -1,20 +1,22 @@
-import com.itextpdf.text.pdf.PdfWriter
+import collection.{JavaConversions, breakOut}
+import com.itextpdf.text.pdf.{BaseFont, DefaultFontMapper, PdfWriter}
+import com.itextpdf.text.{FontFactory, Document => IDocument, Rectangle => IRectangle}
 import io.Source
 import java.awt.geom.Rectangle2D
-import java.awt.{BorderLayout, GradientPaint, Color, EventQueue}
+import java.awt.{Font, BorderLayout, GradientPaint, Color, EventQueue}
 import java.io.{FileOutputStream, File}
 import java.text.{SimpleDateFormat, DateFormat}
 import java.util.{Locale, Calendar, TimeZone, Date}
 import javax.swing.{JComponent, JPanel, WindowConstants, JFrame}
-import org.jfree.chart.axis.{CategoryAnchor, SubCategoryAxis}
+import org.jfree.chart.annotations.{CategoryAnnotation, XYTitleAnnotation}
+import org.jfree.chart.axis.{CategoryAxis, CategoryAnchor, SubCategoryAxis}
 import org.jfree.chart.plot.{CategoryPlot, PlotOrientation}
 import org.jfree.chart.renderer.category.{StandardBarPainter, GroupedStackedBarRenderer}
+import org.jfree.chart.title.LegendTitle
 import org.jfree.chart.{ChartPanel, JFreeChart, ChartFactory}
 import org.jfree.data.category.{CategoryDataset, DefaultCategoryDataset}
-import collection.breakOut
 import org.jfree.data.KeyToGroupMap
-import org.jfree.ui.{StandardGradientPaintTransformer, GradientPaintTransformType}
-import com.itextpdf.text.{Document => IDocument, Rectangle => IRectangle}
+import org.jfree.ui.{RectangleEdge, RectangleAnchor, StandardGradientPaintTransformer, GradientPaintTransformType}
 
 /**
  * (C)opyright 2011 Hanns Holger Rutz. All rights reserved.
@@ -36,7 +38,8 @@ object LimitsOfControl extends Runnable {
 
    def chart3( ps: Seq[ Project ]) {
       val chart = createChart2( createCatSet2( ps ))
-      createPDF( onDesktop( "chart3.pdf" ), chart, 1000, 500 )
+      createPDF( onDesktop( "chart3.pdf" ), chart, 1100, 500 )
+//      showChart( chart )
    }
 
    def chart2( ps: Seq[ Project ]) {
@@ -98,17 +101,114 @@ object LimitsOfControl extends Runnable {
    case object ActivityUpdate extends ActivityType( "Dependancy update" )
    case object ActivityPrint  extends ActivityType( "Debug printing" )
 
+   lazy val userFontDir : File = new File( new File( System.getProperty( "user.home" ), "Library" ), "Fonts" )
+   lazy val systemFontDir = new File( "/Library/Fonts" )
+   lazy val x11type1FontDir = new File( "/usr/X11R6/lib/X11/fonts/Type1" )
+
+   lazy val axisFontName   = "Gulim" // "Share-Regular"      // "Gulim"
+   lazy val axisFontFile   = new File( userFontDir, "Gulim.ttf" ) // "Share-Regular.otf"  // "Gulim.ttf"
+   val axisFontSize        = 11
+//   lazy val titleFontName = "l049016t" // "Luxi Serif Bold Regular"
+//   lazy val titleFontName = "TimesBold" // "Luxi Serif Bold Regular"
+//   lazy val titleFontFile = new File( onDesktop( "font_tmp" ), "TimesBold.ttf" )
+//   lazy val titleFontFile = new File( x11type1FontDir, "l049016t.afm" )
+//   lazy val titleFontName = "Times-Bold"
+//   lazy val titleFontFile  = new File( "/usr/local/texlive/2010/texmf-dist/fonts/afm/adobe/times/ptmb8a.afm" )
+   lazy val titleFontName  = "Arial Narrow" // "BellySansCondensed" // "FreeSerif"
+   lazy val titleFontFile  = {
+//      val res = new File( userFontDir, "FreeSerif.ttf" ) // "Share-Regular.otf"  // "Gulim.ttf"
+//      val res = new File( userFontDir, "BellySansCondensed.ttf" ) // "Share-Regular.otf"  // "Gulim.ttf"
+      val res = new File( systemFontDir, "Arial Narrow.ttf" ) // "Share-Regular.otf"  // "Gulim.ttf"
+      require( res.exists )
+      res
+   }
+   val titleFontSize       = 16
+
+   lazy val fontMapper = {
+      val res = new DefaultFontMapper()
+      val p1 = new DefaultFontMapper.BaseFontParameters( axisFontFile.getAbsolutePath )
+      p1.encoding = BaseFont.IDENTITY_H
+      res.putName( axisFontName, p1 )
+//      val p2 = new DefaultFontMapper.BaseFontParameters( titleFontFile.getAbsolutePath )
+//      p2.encoding = BaseFont.IDENTITY_H // "#simple" // BaseFont.IDENTITY_H
+//      res.putName( titleFontName, p2 )
+      res
+   }
+
+   lazy val axisFont = {
+//      val bf = BaseFont.createFont( new File( userFontDir, fontFile ).getAbsolutePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED )
+////      bf.setPostscriptFontName( "Gulim" )
+//      val res = fontMapper.pdfToAwt( bf, 10 )
+//      println( "Yo, my font is " + res.getFontName )
+//      res
+      fontMapper
+//      val bf = BaseFont.createFont( fontName, BaseFont.IDENTITY_H, BaseFont.EMBEDDED )
+      val bf = BaseFont.createFont( axisFontFile.getAbsolutePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED )
+      val awt = fontMapper.pdfToAwt( bf, axisFontSize )
+      println( "Axis got awt : " + awt.getFamily + " / " + awt.getFontName )
+      awt
+   }
+
+//   lazy val titleFont = new Font( "FreeSerif", Font.BOLD, titleFontSize )
+   lazy val titleFont = new Font( "SansSerif", Font.BOLD, titleFontSize )
+
+//   lazy val titleFont = {
+//      fontMapper
+////      fontMapper.
+////      new Font( titleFontName, Font.BOLD, titleFontSize )
+//
+//      // this results in ExceptionConverter: java.io.UnsupportedEncodingException: Identity-H
+//      val bf = BaseFont.createFont( titleFontFile.getAbsolutePath, BaseFont.IDENTITY_H /* "#simple" */, BaseFont.EMBEDDED )
+////      val bf = new Type1Font( titleFontFile.getAbsolutePath, BaseFont.IDENTITY_H, true, null, null, true )
+////      val bf = BaseFont.createFont( "Times-Bold", "#full", false )
+////      val f    = FontFactory.getFont( FontFactory.TIMES_BOLD, titleFontSize, Font.BOLD )
+////      val bf   = f.getBaseFont
+//
+//      val awt  = fontMapper.pdfToAwt( bf, titleFontSize )
+//      println( "Title got awt : " + awt.getFamily + " / " + awt.getFontName )
+//      awt
+//   }
+
    def createPDF( file: File, chart: JFreeChart, width: Int, height: Int ) {
+//      val fntMap     = new DefaultFontMapper()
+//      val aliases    = fntMap.getAliases()
+//      val iter       = aliases.keySet.iterator
+//      while( iter.hasNext ) {
+//         val key = iter.next
+//         println( key + " -> " + aliases.get( key ))
+//      }
+//      val mapper = fntMap.getMapper
+//      val iter       = mapper.keySet.iterator
+//      while( iter.hasNext ) {
+//         val key = iter.next
+//         println( key + " -> " + mapper.get( key ))
+//      }
+//      fntMap.insertDirectory( userFontDir.getAbsolutePath )
+//      val bf = new DefaultFontMapper.BaseFontParameters( new File( userFontDir, fontFile ).getAbsolutePath )
+//      bf. = BaseFont.FONT_TYPE_TT
+
+//      val bf = BaseFont.createFont( new File( userFontDir, fontFile ).getAbsolutePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED )
+//      bf.setPostscriptFontName( "Gulim" )
+//      fntMap.putName( fontName, bf )
+//      bf.
+
+//      val testFont = fntMap.awtToPdf( new Font( fontName, Font.PLAIN, 10 ))
+//      import JavaConversions._
+//      println( "GOT : " + testFont.getFamilyFontName.toList.flatten )
+
 //      val width      = comp.getWidth
 //      val height     = comp.getHeight
       val pageSize	= new IRectangle( 0, 0, width, height )
       val doc		   = new IDocument( pageSize, 0, 0, 0, 0 )
       val stream	   = new FileOutputStream( file )
       val writer	   = PdfWriter.getInstance( doc, stream )
+//FontFactory.registerDirectories()
+//writer.setAtLeastPdfVersion( PdfWriter.VERSION_1_7 )
+
       doc.open()
       val cb		   = writer.getDirectContent
       val tp		   = cb.createTemplate( width, height )
-      val g2		   = tp.createGraphics( width, height )
+      val g2		   = tp.createGraphics( width, height, fontMapper )
 //      comp.paint( g2 )
 //      comp.print( g2 )
       val r2         = new Rectangle2D.Double( 0, 0, width, height )
@@ -143,7 +243,7 @@ object LimitsOfControl extends Runnable {
       })
       val act = grouped.mapValues( _.flatMap( _.activities ))
 
-      println( act.toList.sortBy( _._1 ))
+//      println( act.toList.sortBy( _._1 ))
 
 //      val mapped: Map[ Int, Seq[ Edit ]] = grouped.map( tup => tup._1 -> tup._2.flatMap( _.activities.flatMap( _.edits )))( breakOut )
 //      val mapped: Map[ Int, Map[ ActivityCateg, Map[ EditType, Int ]]] = grouped.mapValues( _.flatMap( _.activities )
@@ -167,7 +267,7 @@ object LimitsOfControl extends Runnable {
                val num = map2.getOrElse( src, 0 )
                val v = EditCategory2( src, categ )
                val d = dfmt.format( cal.getTime() )
-               println( "" + d + " (" + cal.get( Calendar.DAY_OF_YEAR ) + "), " + num + ", " + v )
+//               println( "" + d + " (" + cal.get( Calendar.DAY_OF_YEAR ) + "), " + num + ", " + v )
                set.addValue( num, v, d )
             }
          }
@@ -190,8 +290,10 @@ object LimitsOfControl extends Runnable {
 
    def createChart2( set: CategoryDataset ) : JFreeChart = {
       val chart = ChartFactory.createStackedBarChart(
-         "Commit History", "Category", "LOC", set,
+         "Commit History", "Category", "Lines of Code", set,
          PlotOrientation.VERTICAL, true, false, false )
+
+      chart.getTitle().setFont( titleFont )
 
       val renderer = new GroupedStackedBarRenderer()
       val map = new KeyToGroupMap( "G1" )
@@ -202,6 +304,7 @@ object LimitsOfControl extends Runnable {
          }
       }
       renderer.setSeriesToGroupMap( map )
+//      renderer.setBaseItemLabelFont( titleFont )
 
       renderer.setItemMargin( 0.10 )
       renderer.setDrawBarOutline( false )
@@ -240,9 +343,12 @@ object LimitsOfControl extends Runnable {
       domainAxis.setCategoryMargin( 0.2 )
 //      domainAxis.setAxisLineVisible( true )
 //      domainAxis.setAxisLinePaint( Color.blue )
+//      domainAxis.setLabel( "Date" )
+//      domainAxis.setTickLabelsVisible( false ) // affects dates
+//      domainAxis.setVisible( false ) // affects all
 
       val plot = chart.getPlot().asInstanceOf[ CategoryPlot ]
-      plot.setDomainAxis( domainAxis )
+//      plot.setDomainAxis( domainAxis )
 
 //      plot.setDomainGridlinesVisible( true )
 //      plot.setDomainGridlinePaint( Color.lightGray )
@@ -256,6 +362,31 @@ object LimitsOfControl extends Runnable {
       plot.setOutlinePaint( Color.gray )
       // plot.setRangeCrosshairPaint( Color.blue )
       plot.setRangeGridlinePaint( Color.lightGray )
+
+//      plot.setAnchorValue( 100 ) // no apparent effect
+      val xaxis = new CategoryAxis()
+//      axis.setLabelAngle( 90 )    // no apparent effect
+//      axis.setFixedDimension( 100 )    // no apparent effect
+//      axis.setTickLabelFont( new Font( fontName, Font.PLAIN, 10 ))
+      xaxis.setTickLabelFont( axisFont )
+      plot.setDomainAxis( xaxis )
+
+      val yaxis = plot.getRangeAxis()
+      yaxis.setLabelFont( axisFont )
+      yaxis.setTickLabelFont( axisFont )
+
+//      val legend = chart.getLegend()
+////      legend.setLegendItemGraphicLocation( RectangleAnchor.TOP_RIGHT )
+//      legend.setPosition( RectangleEdge.TOP )
+
+//      val lt = new LegendTitle( plot )
+////      lt.setItemFont(new Font("Dialog", Font.PLAIN, 9));
+////      lt.setBackgroundPaint(new Color(200, 200, 255, 100));
+////      lt.setFrame( new BlockBorder( Color.white ))
+//      lt.setPosition( RectangleEdge.BOTTOM )
+//      val ta = new CategoryTextAnnotation( 0.98, 0.02, lt, RectangleAnchor.BOTTOM_RIGHT )
+//      ta.setMaxWidth( 0.48 )
+//      plot.addAnnotation( ta )
 
       // setCategorySummary(dataset);
 
@@ -280,8 +411,14 @@ object LimitsOfControl extends Runnable {
       def id: Int
       def compareTo( other: ActivityCateg ) = id.compareTo( other.id )
    }
-   case object ActivityCategCompo extends ActivityCateg { def id = 0 }
-   case object ActivityCategOther extends ActivityCateg { def id = 1 }
+   case object ActivityCategCompo extends ActivityCateg {
+      def id = 0
+      override def toString = "Composition"
+   }
+   case object ActivityCategOther extends ActivityCateg {
+      def id = 1
+      override def toString = "Infrastructure"
+   }
 
    case class EditCategory2( source: EditSourceType, activity: ActivityCateg ) extends Comparable[ EditCategory2 ] {
       def compareTo( other: EditCategory2 ) = {
@@ -290,6 +427,8 @@ object LimitsOfControl extends Runnable {
             activity.compareTo( other.activity )
          }
       }
+
+      override def toString = activity.toString + " / " + source.toString
    }
 
    /**
@@ -411,9 +550,9 @@ object LimitsOfControl extends Runnable {
       def id: Int
       def compareTo( b: EditSourceType ) = id.compareTo( b.id )
    }
-   case object EditSourceNew extends EditSourceType {   def id = 0; override def toString = "New" }
-   case object EditSourceOther extends EditSourceType { def id = 1; override def toString = "Other" }
-   case object EditSourceSelf extends EditSourceType {  def id = 2; override def toString = "Self" }
+   case object EditSourceNew extends EditSourceType {   def id = 0; override def toString = "Newly created" }
+   case object EditSourceOther extends EditSourceType { def id = 1; override def toString = "From previous work" }
+   case object EditSourceSelf extends EditSourceType {  def id = 2; override def toString = "Self referential" }
 
    sealed trait EditSource { def tpe: EditSourceType }
    case object NewSource extends EditSource { def tpe = EditSourceNew }
