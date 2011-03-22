@@ -3,20 +3,21 @@ import com.itextpdf.text.pdf.{BaseFont, DefaultFontMapper, PdfWriter}
 import com.itextpdf.text.{FontFactory, Document => IDocument, Rectangle => IRectangle}
 import io.Source
 import java.awt.geom.Rectangle2D
-import java.awt.{Font, BorderLayout, GradientPaint, Color, EventQueue}
+import java.awt.{Graphics2D, Font, BorderLayout, GradientPaint, Color, EventQueue}
 import java.io.{FileOutputStream, File}
 import java.text.{SimpleDateFormat, DateFormat}
 import java.util.{Locale, Calendar, TimeZone, Date}
 import javax.swing.{JComponent, JPanel, WindowConstants, JFrame}
 import org.jfree.chart.annotations.{CategoryAnnotation, XYTitleAnnotation}
-import org.jfree.chart.axis.{CategoryAxis, CategoryAnchor, SubCategoryAxis}
+import org.jfree.chart.axis.{ValueAxis, CategoryAxis, CategoryAnchor, SubCategoryAxis}
+import org.jfree.chart.block.{RectangleConstraint, LabelBlock, BlockBorder, BorderArrangement, BlockContainer}
 import org.jfree.chart.plot.{CategoryPlot, PlotOrientation}
 import org.jfree.chart.renderer.category.{StandardBarPainter, GroupedStackedBarRenderer}
 import org.jfree.chart.title.LegendTitle
-import org.jfree.chart.{ChartPanel, JFreeChart, ChartFactory}
+import org.jfree.chart.{LegendItemSource, ChartPanel, JFreeChart, ChartFactory}
 import org.jfree.data.category.{CategoryDataset, DefaultCategoryDataset}
 import org.jfree.data.KeyToGroupMap
-import org.jfree.ui.{RectangleEdge, RectangleAnchor, StandardGradientPaintTransformer, GradientPaintTransformType}
+import org.jfree.ui.{RectangleInsets, HorizontalAlignment, RectangleEdge, RectangleAnchor, StandardGradientPaintTransformer, GradientPaintTransformType}
 
 /**
  * (C)opyright 2011 Hanns Holger Rutz. All rights reserved.
@@ -38,7 +39,7 @@ object LimitsOfControl extends Runnable {
 
    def chart3( ps: Seq[ Project ]) {
       val chart = createChart2( createCatSet2( ps ))
-      createPDF( onDesktop( "chart3.pdf" ), chart, 1100, 500 )
+      createPDF( onDesktop( "commitchart.pdf" ), chart, 1050, 400 )
 //      showChart( chart )
    }
 
@@ -107,7 +108,8 @@ object LimitsOfControl extends Runnable {
 
    lazy val axisFontName   = "Gulim" // "Share-Regular"      // "Gulim"
    lazy val axisFontFile   = new File( userFontDir, "Gulim.ttf" ) // "Share-Regular.otf"  // "Gulim.ttf"
-   val axisFontSize        = 11
+   val axisFontSize        = 12
+   val legendFontSize      = 13
 //   lazy val titleFontName = "l049016t" // "Luxi Serif Bold Regular"
 //   lazy val titleFontName = "TimesBold" // "Luxi Serif Bold Regular"
 //   lazy val titleFontFile = new File( onDesktop( "font_tmp" ), "TimesBold.ttf" )
@@ -135,19 +137,13 @@ object LimitsOfControl extends Runnable {
       res
    }
 
-   lazy val axisFont = {
-//      val bf = BaseFont.createFont( new File( userFontDir, fontFile ).getAbsolutePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED )
-////      bf.setPostscriptFontName( "Gulim" )
-//      val res = fontMapper.pdfToAwt( bf, 10 )
-//      println( "Yo, my font is " + res.getFontName )
-//      res
+   lazy val axisIFont = {
       fontMapper
-//      val bf = BaseFont.createFont( fontName, BaseFont.IDENTITY_H, BaseFont.EMBEDDED )
-      val bf = BaseFont.createFont( axisFontFile.getAbsolutePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED )
-      val awt = fontMapper.pdfToAwt( bf, axisFontSize )
-      println( "Axis got awt : " + awt.getFamily + " / " + awt.getFontName )
-      awt
+      BaseFont.createFont( axisFontFile.getAbsolutePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED )
    }
+
+   lazy val axisFont    = fontMapper.pdfToAwt( axisIFont, axisFontSize )
+   lazy val legendFont  = fontMapper.pdfToAwt( axisIFont, legendFontSize )
 
 //   lazy val titleFont = new Font( "FreeSerif", Font.BOLD, titleFontSize )
    lazy val titleFont = new Font( "SansSerif", Font.BOLD, titleFontSize )
@@ -290,10 +286,13 @@ object LimitsOfControl extends Runnable {
 
    def createChart2( set: CategoryDataset ) : JFreeChart = {
       val chart = ChartFactory.createStackedBarChart(
-         "Commit History", "Category", "Lines of Code", set,
+         "" /* "Commit History" */, "Category", "Lines of Code", set,
          PlotOrientation.VERTICAL, true, false, false )
 
-      chart.getTitle().setFont( titleFont )
+//      chart.getTitle().setFont( titleFont )
+      chart.getTitle().setVisible( false )
+//      chart.setPadding( new RectangleInsets( 0, 0, 0, 0 ))
+//      chart.setBorderVisible( false )
 
       val renderer = new GroupedStackedBarRenderer()
       val map = new KeyToGroupMap( "G1" )
@@ -335,27 +334,29 @@ object LimitsOfControl extends Runnable {
 //      renderer.setLegendItemLabelGenerator( new SOCRCategorySeriesLabelGenerator() )
       renderer.setBarPainter( new StandardBarPainter() )
 
-      val domainAxis = new SubCategoryAxis( "XXX" )
-      domainAxis.setCategoryMargin( 0.05 )
-      domainAxis.addSubCategory( "C" ) // EditSourceNew.toString )
-      domainAxis.addSubCategory( "O" ) // EditSourceOther.toString )
-//      domainAxis.addSubCategory( "I" ) // EditSourceSelf.toString )
-      domainAxis.setCategoryMargin( 0.2 )
-//      domainAxis.setAxisLineVisible( true )
-//      domainAxis.setAxisLinePaint( Color.blue )
-//      domainAxis.setLabel( "Date" )
-//      domainAxis.setTickLabelsVisible( false ) // affects dates
-//      domainAxis.setVisible( false ) // affects all
-
+//      val domainAxis = new SubCategoryAxis( "XXX" )
+//      domainAxis.setCategoryMargin( 0.05 )
+//      domainAxis.addSubCategory( "C" ) // EditSourceNew.toString )
+//      domainAxis.addSubCategory( "O" ) // EditSourceOther.toString )
+////      domainAxis.addSubCategory( "I" ) // EditSourceSelf.toString )
+//      domainAxis.setCategoryMargin( 0.2 )
+////      domainAxis.setAxisLineVisible( true )
+////      domainAxis.setAxisLinePaint( Color.blue )
+////      domainAxis.setLabel( "Date" )
+////      domainAxis.setTickLabelsVisible( false ) // affects dates
+////      domainAxis.setVisible( false ) // affects all
+//
       val plot = chart.getPlot().asInstanceOf[ CategoryPlot ]
-//      plot.setDomainAxis( domainAxis )
+////      plot.setDomainAxis( domainAxis )
+//      plot.setAxisOffset( new RectangleInsets( 0, 0, 0, 0 ))
+      plot.setInsets( new RectangleInsets( 0, 0, 0, 0 ))
 
 //      plot.setDomainGridlinesVisible( true )
 //      plot.setDomainGridlinePaint( Color.lightGray )
 //      plot.setDomainGridlinePosition( CategoryAnchor.START ) // XXX hmmm, not optimal ; could use MIDDLE with custom Stroke?
 
 //      plot.setDomainAxisLocation( AxisLocation.TOP_OR_RIGHT )
-      plot.setRenderer(renderer);
+      plot.setRenderer( renderer )
 //      plot.setFixedLegendItems( createLegendItems() )
       plot.setBackgroundPaint( Color.white )
 //      plot.setDomainGridlinePaint( Color.blue )
@@ -370,12 +371,18 @@ object LimitsOfControl extends Runnable {
 //      axis.setTickLabelFont( new Font( fontName, Font.PLAIN, 10 ))
       xaxis.setTickLabelFont( axisFont )
       plot.setDomainAxis( xaxis )
+//      xaxis.setCategoryMargin( 0.0 )
+//      xaxis.setLabelInsets( new RectangleInsets( 0, 0, 0, 0 ))
+//      xaxis.setFixedDimension( 0.0 )
+      xaxis.setLowerMargin( 0.01 )
+      xaxis.setUpperMargin( 0.01 )
 
       val yaxis = plot.getRangeAxis()
       yaxis.setLabelFont( axisFont )
       yaxis.setTickLabelFont( axisFont )
 
-//      val legend = chart.getLegend()
+      val legendOld = chart.getLegend()
+      legendOld.setVisible( false )
 ////      legend.setLegendItemGraphicLocation( RectangleAnchor.TOP_RIGHT )
 //      legend.setPosition( RectangleEdge.TOP )
 
@@ -387,6 +394,44 @@ object LimitsOfControl extends Runnable {
 //      val ta = new CategoryTextAnnotation( 0.98, 0.02, lt, RectangleAnchor.BOTTOM_RIGHT )
 //      ta.setMaxWidth( 0.48 )
 //      plot.addAnnotation( ta )
+
+      val legend = new LegendTitle( plot )
+      legend.setBackgroundPaint( Color.white )
+      legend.setPadding( 10, 10, 10, 10 )
+
+//      val lala = legend.getSources
+//      val lala2 = new Array[ LegendItemSource ]( lala.size - 1 )
+//      System.arraycopy( lala, 0, lala2, 0, lala2.size )
+//      legend.setSources( lala2 )
+
+//      val blockcontainer = new BlockContainer( new BorderArrangement() )
+//      blockcontainer.setBorder( new BlockBorder( 1.0D, 1.0D, 1.0D, 1.0D ))
+      val contItem = legend.getItemContainer()
+
+      contItem.setPadding( 2D, 10D, 5D, 2D )
+//      blockcontainer.add( blockcontainer1 )
+      legend.setWrapper( contItem )
+      legend.setItemFont( legendFont )
+//      legend.setPosition( RectangleEdge.RIGHT )
+         legend.setHorizontalAlignment( HorizontalAlignment.LEFT )
+//      chart.addSubtitle( legend )
+//      legend.setFrame( )
+
+      plot.addAnnotation( new CategoryAnnotation {
+         def draw( g2: Graphics2D, plot: CategoryPlot, r: Rectangle2D, xaxis: CategoryAxis, yaxis: ValueAxis ) {
+//            println( "-------AQUI : " + r )
+//            legend.setBounds( new Rectangle2D.Double( r.getX + r.getWidth * 0.5, r.getY, r.getWidth * 0.5, r.getHeight ))
+            val w       = 0.25
+            val right   = 0.03
+            val top     = 0.03
+            val h       = 0.31
+            legend.arrange( g2, new RectangleConstraint( r.getWidth * w, r.getHeight * h ))
+            legend.draw( g2, new Rectangle2D.Double(
+               r.getX + r.getWidth * (1.0 - (w + right)), r.getY + r.getHeight * top, r.getWidth * w, r.getHeight * h ))
+//            g2.setColor( Color.red )
+//            g2.fill( r )
+         }
+      })
 
       // setCategorySummary(dataset);
 
