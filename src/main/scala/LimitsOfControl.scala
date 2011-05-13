@@ -39,7 +39,8 @@ object LimitsOfControl extends Runnable {
 
    def chart3( ps: Seq[ Project ]) {
       val chart = createChart2( createCatSet2( ps ))
-      createPDF( onDesktop( "commitchart.pdf" ), chart, 1050, 400 )
+//      createPDF( onDesktop( "commitchart.pdf" ), chart, 1050, 400 )
+      createPDF( onDesktop( "commitchart.pdf" ), chart, 1050 * 5 / 4, 400 )
 //      showChart( chart )
    }
 
@@ -108,8 +109,8 @@ object LimitsOfControl extends Runnable {
 
    lazy val axisFontName   = "Gulim" // "Share-Regular"      // "Gulim"
    lazy val axisFontFile   = new File( userFontDir, "Gulim.ttf" ) // "Share-Regular.otf"  // "Gulim.ttf"
-   val axisFontSize        = 12
-   val legendFontSize      = 13
+   val axisFontSize        = 15 // 12
+   val legendFontSize      = 17 // 13
 //   lazy val titleFontName = "l049016t" // "Luxi Serif Bold Regular"
 //   lazy val titleFontName = "TimesBold" // "Luxi Serif Bold Regular"
 //   lazy val titleFontFile = new File( onDesktop( "font_tmp" ), "TimesBold.ttf" )
